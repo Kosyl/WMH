@@ -72,12 +72,6 @@ public class Ant
 				break;
 			}
 		}
-		
-		if(path.edges.size() > 100)
-		{
-			i = 0;
-			i++;
-		}
 	}
 
 	public void removeLoops()

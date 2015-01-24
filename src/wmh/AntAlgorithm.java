@@ -12,6 +12,7 @@ public class AntAlgorithm
 	int currentEpoch;
 	long duration;
 	Vector<Path> foundPaths;
+	Vector<Integer> pathsInEpoch;
 	
 	public AntAlgorithm(Graph graph)
 	{
@@ -25,6 +26,7 @@ public class AntAlgorithm
 		currentEpoch = 0;
 		
 		foundPaths = new Vector<Path>();
+		pathsInEpoch = new Vector<Integer>();
 	}
 	
 	public GraphResults calcBestPath()
@@ -59,6 +61,7 @@ public class AntAlgorithm
 	
 	private void printSummary()
 	{
+		System.out.println("####################################################");
 		System.out.println("koniec");
 		System.out.format("czas: %d\n",duration);
 		System.out.format("liczba iteracji: %d\\%d\n",currentEpoch,Configuration.maxEpochs);
@@ -67,6 +70,17 @@ public class AntAlgorithm
 		{
 			System.out.println(path.toString());
 		}
+		System.out.println("iloœæ œcie¿ek:");
+		Iterator<Integer> i = pathsInEpoch.iterator();
+		do
+		{
+			System.out.print(i.next());
+			if(!i.hasNext())
+				break;
+
+			System.out.print(" -> ");
+		}
+		while(true);
 	}
 
 	private void aggregatePaths()
@@ -101,6 +115,8 @@ public class AntAlgorithm
 				System.out.println(path.toString());
 			}
 		}
+		
+		pathsInEpoch.add(foundPaths.size());
 	}
 
 
