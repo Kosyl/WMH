@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //klasa glowna
 public class Main
@@ -12,21 +14,25 @@ public class Main
 	Results results = new Results();
 
 	// konstruktor parsuje plik konfiguracyjny
-	Main(String plik)
+	Main()
+	{
+		
+	}
+
+	public void startForConfigFile(String plik)
 	{
 		try
 		{
+			if(plik.isEmpty())
+				return;
 			readConfig(plik);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			System.out.println("Wyjatek: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}
-	}
-
-	public void start()
-	{
 		int counter = 0;
 		for (String filename : Configuration.files)
 		{
@@ -42,7 +48,7 @@ public class Main
 		results.writeResults();
 	}
 
-	public static void sampleCheck()
+	public void sampleCheck()
 	{
 		Graph g = getSampleGraph();
 		if (g != null)
@@ -54,6 +60,30 @@ public class Main
 			gRes.q = g.q;
 
 			new AntAlgorithm(g).calcBestPath();
+		}
+	}
+	
+	public void singleGraph(String graphPath)
+	{
+		try
+		{
+			Graph g = readGraph(graphPath);
+			if (g != null)
+			{
+				GraphResults gRes = new GraphResults();
+				gRes.bestPossibleCost = g.bestPathCost;
+				gRes.filename = "sampleGraph.txt";
+				gRes.n = g.n;
+				gRes.q = g.q;
+
+				new AntAlgorithm(g).calcBestPath();
+			}
+		} 
+		catch (Exception e)
+		{
+			System.out.println("Wyjatek: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -111,18 +141,35 @@ public class Main
 			FileReader fi = new FileReader(confPath);
 			BufferedReader config = new BufferedReader(fi);
 
-			int q, n, vBegin, vEnd;
+			int q, n, vBegin, vEnd, v1, v2, last;
 			double weight;
 			String s = config.readLine();
 
-			n = Integer.parseInt(s.split(" ")[3]);
-			q = Integer.parseInt(s.split(" ")[4]);
+			n = Integer.parseInt(s.split(" ")[1]);
+			q = Integer.parseInt(s.split(" ")[3]);
 
 			Graph g = new Graph(n);
 
 			s = config.readLine();
-			g.bestPathCost = Integer.parseInt(s.split(" ")[1]);
+			g.bestPathCost = Double.parseDouble(s.split(" ")[3]);
+			g.foodIdx = Integer.parseInt(s.split(" ")[1]);
+			g.nestIdx = Integer.parseInt(s.split(" ")[2]);
+			g.bestPath.add(g.foodIdx);
 
+			s = config.readLine();
+			
+			Pattern pair = Pattern.compile("\\[[0-9]+ [0-9]+\\]");
+			 Matcher m = pair.matcher(s);
+			 while(m.find())
+			 {
+				 String edge = m.group();
+				 edge = edge.substring(1, edge.length()-1);
+				 v1 = Integer.parseInt(edge.split(" ")[0]);
+				 v2 = Integer.parseInt(edge.split(" ")[1]);
+				 last = g.bestPath.lastElement();
+				 g.bestPath.add(v1 == last? v2 : v1);
+			 }
+			 
 			for (int i = 0; i < q; ++i)
 			{
 				s = config.readLine();
@@ -137,7 +184,8 @@ public class Main
 			fi.close();
 
 			return g;
-		} catch (IOException e)
+		} 
+		catch (IOException e)
 		{
 			System.out.println("File input stream failure: " + e.getMessage());
 		}
@@ -167,10 +215,10 @@ public class Main
 	static public void main(String[] arg)
 	{
 		String config;
-		config = "D:\\txt\\mvcconfig.txt";
+		config = "D:\\test.txt";
 		// config = arg[0];
-		//Main program = new Main(config);
-		//program.start();
-		Main.sampleCheck();
+		
+		Main program = new Main();
+		program.singleGraph(config);
 	}
 }

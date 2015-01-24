@@ -7,17 +7,19 @@ import java.util.Random;
 
 public class Ant
 {
-	LinkedList<Edge> path;
+	Path path;
 	Vertex currentVertex;
 	Vertex previousVertex;
 	int startIdx = -1;
+	public int idx;
+	public boolean lost;
 
 	@Override
 	public String toString()
 	{
 		int lastIdx = startIdx;
 		String res = "current: " + currentVertex.idx + ", path: " + startIdx;
-		for (Edge e : path)
+		for (Edge e : path.edges)
 		{
 			int newIdx = (e.begin.idx == lastIdx ? e.end.idx : e.begin.idx);
 			res += " " + newIdx;
@@ -26,9 +28,12 @@ public class Ant
 		return res;
 	}
 
-	public Ant()
+	public Ant(int antIdx,int foodIdx)
 	{
-		path = new LinkedList<Edge>();
+		path = new Path();
+		this.startIdx = foodIdx;
+		path.foodIdx = foodIdx;
+		idx = antIdx;
 	}
 
 	public void takeStep()
@@ -60,12 +65,18 @@ public class Ant
 			if (p < distr[i])
 			{
 				Edge e = currentVertex.edges.get(i);
-				path.add(e);
+				path.edges.add(e);
 				previousVertex = currentVertex;
 				currentVertex = e.begin.idx == currentVertex.idx ? e.end
 						: e.begin;
 				break;
 			}
+		}
+		
+		if(path.edges.size() > 100)
+		{
+			i = 0;
+			i++;
 		}
 	}
 
@@ -77,7 +88,7 @@ public class Ant
 		int lastVertex = startIdx;
 		int nextVertex;
 
-		for (Edge e : path)
+		for (Edge e : path.edges)
 		{
 			nextVertex = e.begin.idx == lastVertex ? e.end.idx : e.begin.idx;
 			vertices.add(nextVertex);
@@ -108,7 +119,7 @@ public class Ant
 		ListIterator<Integer> iter = finalVertices.listIterator();
 		int currentBegin = iter.next();
 		int currentEnd = iter.next();
-		for (Edge e : path)
+		for (Edge e : path.edges)
 		{
 			if ((e.begin.idx == currentBegin && e.end.idx == currentEnd)
 					|| (e.end.idx == currentBegin && e.begin.idx == currentEnd))
@@ -119,15 +130,7 @@ public class Ant
 					currentEnd = iter.next();
 			}
 		}
-	}
-
-	public double getPathCost()
-	{
-		double sum = 0.0;
-		for (Edge e : path)
-		{
-			sum += e.weight;
-		}
-		return sum;
+		this.path.edges = finalPath;
+		this.path.refreshCost();
 	}
 }
