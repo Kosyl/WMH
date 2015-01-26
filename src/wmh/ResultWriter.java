@@ -14,7 +14,7 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 
 //wyniki
-public class Results 
+public class ResultWriter 
 {
 	Vector<RunResults> results = new Vector<>();
 	

@@ -26,10 +26,11 @@ public class RunResults
 	public double maxInitialPheromone = 0.2;
 	public int numberOfAnts = 30;
 	
-	public String foundPath;
-	public double foundCost;
-	public long executionTimeInNs;
-	public int numEpochs;
+	public String bestFoundPath;
+	public double bestFoundCost;
+	public double meanFoundCost;
+	public long meanExecutionTimeInNs;
+	public int meanNumEpochs;
 
-	public Vector<Integer> pathsInEpochs = new Vector<Integer>();
+	public Vector<Integer> meanPathsInEpochs = new Vector<Integer>();
 }

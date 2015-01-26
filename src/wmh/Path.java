@@ -42,6 +42,16 @@ public class Path
 		numAnts = 0;
 	}
 	
+	@Override
+	public Path clone()
+	{
+		Path p = new Path();
+		p.edges = (LinkedList<Edge>) this.edges.clone();
+		p.cost = this.cost;
+		p.numAnts = this.numAnts;
+		p.foodIdx = this.foodIdx;
+		return p;
+	}
 
 	public static boolean isDifferent(Path path,Path path2)
 	{

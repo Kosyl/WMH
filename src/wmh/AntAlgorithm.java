@@ -12,7 +12,10 @@ public class AntAlgorithm
 	long duration;
 	Vector<Path> foundPaths;
 	Path bestPath;
-	Vector<Integer> pathsInEpoch;
+	Path bestPathInRun;
+	double meanCost = 0.0;
+	long meanDuration = 0;
+	Vector<Double> pathsInEpoch;
 	boolean error = false;
 	
 	public AntAlgorithm(Graph graph)
@@ -27,31 +30,48 @@ public class AntAlgorithm
 		currentEpoch = 0;
 		
 		foundPaths = new Vector<Path>();
-		pathsInEpoch = new Vector<Integer>();
+		pathsInEpoch = new Vector<Double>();
 	}
 	
 	public RunResults calcBestPath()
 	{
+		this.bestPath = new Path();
+		bestPath.cost = Double.MAX_VALUE;
+		
 		long start, stop;
 		
-		do
+		for(int i = 0; i < Configuration.repetitions; ++i)
 		{
-			g.reset();
-			error = false;
-			start = System.nanoTime();
+			do
+			{
+				g.reset();
+				currentEpoch = 0;
+				error = false;
+				
+				start = System.nanoTime();
+				launchLoop();
+				stop = System.nanoTime();
+				
+				duration = stop-start;
+				if(currentEpoch > Configuration.maxEpochs)
+					currentEpoch = Configuration.maxEpochs;
+				
+			}
+			while(error);
+
+			meanDuration += duration;
+			processResults();
 			
-			launchLoop();
-			stop = System.nanoTime();
+			System.out.format("%d ",i);
 		}
-		while(error);
+		System.out.println();
 		
-		
-		duration = stop-start;
-		if(currentEpoch > Configuration.maxEpochs)
-			currentEpoch = Configuration.maxEpochs;
-		
-		findBestPath();
-		
+		meanDuration/=Configuration.repetitions;
+		meanCost/=Configuration.repetitions;
+		for(int i = 0; i < pathsInEpoch.size(); ++i)
+		{
+			pathsInEpoch.set(i, pathsInEpoch.elementAt(i)/Configuration.repetitions);
+		}
 		if(Configuration.debug)
 			printSummary();
 		
@@ -59,16 +79,17 @@ public class AntAlgorithm
 		
 		results.bestPossibleCost = g.bestPathCost;
 		results.bestPossiblePath =(Vector) g.bestPath.clone();
-		results.executionTimeInNs = duration;
+		results.meanExecutionTimeInNs = meanDuration;
 		results.foodIdx = g.foodIdx;
 		results.nestIdx = g.nestIdx;
 		results.n = g.n;
 		results.q = g.q;
 		results.numberOfAnts = Configuration.numberOfAnts;
 		results.maxInitialPheromone = Configuration.maxInitialPheromone;
-		results.foundCost = bestPath.cost;
-		results.foundPath = bestPath.toString();
-		results.pathsInEpochs = (Vector) this.pathsInEpoch.clone();
+		results.bestFoundCost = bestPath.cost;
+		results.meanFoundCost = meanCost;
+		results.bestFoundPath = bestPath.toString();
+		results.meanPathsInEpochs = (Vector) this.pathsInEpoch.clone();
 		results.pheromoneAttractiveness = Configuration.pheromoneAttractiveness;
 		results.pheromoneFadingRate = Configuration.pheromoneFadingRate;
 		results.pheromoneQConstant = Configuration.pheromoneQConstant;
@@ -96,16 +117,23 @@ public class AntAlgorithm
 		return error;
 	}
 	
-	private void findBestPath()
+	private void processResults()
 	{
-		this.bestPath = new Path();
-		bestPath.cost = Double.MAX_VALUE;
+		this.bestPathInRun = new Path();
+		bestPathInRun.cost = Double.MAX_VALUE;
 		
 		for(Path p:foundPaths)
 		{
-			if(p.cost < bestPath.cost)
-				bestPath = p;
+			if(p.cost < bestPathInRun.cost)
+				bestPathInRun = p;
 		}
+		
+		if(bestPath.cost > bestPathInRun.cost)
+		{
+			bestPath = bestPathInRun.clone();
+		}
+		
+		meanCost += bestPathInRun.cost;
 	}
 
 	private void printSummary()
@@ -120,7 +148,7 @@ public class AntAlgorithm
 			System.out.println(path.toString());
 		}
 		System.out.println("iloœæ œcie¿ek:");
-		Iterator<Integer> i = pathsInEpoch.iterator();
+		Iterator<Double> i = pathsInEpoch.iterator();
 		do
 		{
 			System.out.print(i.next());
@@ -164,8 +192,12 @@ public class AntAlgorithm
 				System.out.println(path.toString());
 			}
 		}
-		
-		pathsInEpoch.add(foundPaths.size());
+		if(pathsInEpoch.size() < currentEpoch)
+		pathsInEpoch.add((double)foundPaths.size());
+		else
+		{
+			pathsInEpoch.set(currentEpoch-1, pathsInEpoch.elementAt(currentEpoch-1)+(double)foundPaths.size());
+		}
 	}
 
 

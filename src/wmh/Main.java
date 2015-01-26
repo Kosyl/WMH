@@ -2,6 +2,7 @@ package wmh;
 
 import java.awt.Dimension;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -20,7 +21,7 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 public class Main
 {
 	// wyniki algorytmow
-	Results results = new Results();
+	ResultWriter results = new ResultWriter();
 	LinkedList<RunResults> partialResults = new LinkedList<>();
 	Vector<Integer> checkedNumAnts = new Vector<>();
 	Vector<Double> checkedWeightAttr = new Vector<>();
@@ -48,7 +49,7 @@ public class Main
 		{
 			checkedFadingRate.add(r);
 		}
-		int[] ii = {1,2,3,4,5,7,10,15,20,25,30,40,50,70,100};
+		int[] ii = {3,4,5,7,10,15,20,25,30,40,50,70,100};
 		//for(int i = 1; i < 500; i += 5)
 		for(int i:ii)
 		{
