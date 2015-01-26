@@ -16,7 +16,7 @@ import jxl.WorkbookSettings;
 //wyniki
 public class Results 
 {
-	Vector<GraphResults> results = new Vector<>();
+	Vector<RunResults> results = new Vector<>();
 	
 	public void writeResults()
 	{
@@ -74,7 +74,7 @@ public class Results
 			
 			int row = 2;
 			
-			for(GraphResults res: results)
+			for(RunResults res: results)
 			{
 				PrintWriter writer;
 				try 

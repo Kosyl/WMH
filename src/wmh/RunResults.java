@@ -3,7 +3,7 @@ package wmh;
 import java.util.Vector;
 
 //struktura z wynikami dla jednego grafu
-public class GraphResults 
+public class RunResults 
 {
 	//nazwa pliku wejsciowego
 	public String filename;
@@ -17,7 +17,7 @@ public class GraphResults
 	public int foodIdx;
 	public int nestIdx;
 	public double bestPossibleCost;
-	public Vector<Integer> bestPossiblePath;
+	public Vector<Integer> bestPossiblePath= new Vector<Integer>();
 	
 	public double pheromoneAttractiveness = 1.0;
 	public double weightAttractiveness = 1.0;
@@ -26,8 +26,10 @@ public class GraphResults
 	public double maxInitialPheromone = 0.2;
 	public int numberOfAnts = 30;
 	
-	public Vector<Integer> foundPath;
+	public String foundPath;
 	public double foundCost;
 	public long executionTimeInNs;
 	public int numEpochs;
+
+	public Vector<Integer> pathsInEpochs = new Vector<Integer>();
 }

@@ -19,9 +19,11 @@ public class Configuration
 	public static double maxInitialPheromone = 0.02;
 	
 	public static int numberOfAnts = 300;
-	public static long antTimeout = 5000000000L;
+	public static long antTimeout = 500000000L;
 	
 	public static int maxEpochs = 2500;
 	
 	public static boolean debug = true;
+	
+	public static int repetitions = 100;
 }

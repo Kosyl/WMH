@@ -2,8 +2,7 @@ package wmh;
 
 import java.awt.Dimension;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,11 +21,39 @@ public class Main
 {
 	// wyniki algorytmow
 	Results results = new Results();
+	LinkedList<RunResults> partialResults = new LinkedList<>();
+	Vector<Integer> checkedNumAnts = new Vector<>();
+	Vector<Double> checkedWeightAttr = new Vector<>();
+	Vector<Double> checkedPheromoneAttr = new Vector<>();
+	Vector<Double> checkedFadingRate = new Vector<>();
 
 	// konstruktor parsuje plik konfiguracyjny
 	Main()
 	{
-		
+		initTables();
+	}
+
+	private void initTables()
+	{
+		double[] ww = {0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
+		//for(double w = 0.01; w < 10; w += 0.15)
+		for(double w:ww)
+		{
+			checkedWeightAttr.add(w);
+			checkedPheromoneAttr.add(w);
+		}
+		double[] rr = {0.999,0.99,0.95,0.9,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.05,0.01,0.001};
+		//for(double r = 0.01; r < 1; r += 0.02)
+		for(double r:rr)
+		{
+			checkedFadingRate.add(r);
+		}
+		int[] ii = {1,2,3,4,5,7,10,15,20,25,30,40,50,70,100};
+		//for(int i = 1; i < 500; i += 5)
+		for(int i:ii)
+		{
+			checkedNumAnts.add(i);
+		}
 	}
 
 	public void startForConfigFile(String plik)
@@ -63,7 +90,7 @@ public class Main
 		Graph g = getSampleGraph();
 		if (g != null)
 		{
-			GraphResults gRes = new GraphResults();
+			RunResults gRes = new RunResults();
 			gRes.bestPossibleCost = g.bestPathCost;
 			gRes.filename = "sampleGraph.txt";
 			gRes.n = g.n;
@@ -78,16 +105,39 @@ public class Main
 		try
 		{
 			Graph g = readGraph(graphPath);
+			Configuration.debug = false;
+			
 			//showGraph(g);
 			if (g != null)
 			{
-				GraphResults gRes = new GraphResults();
-				gRes.bestPossibleCost = g.bestPathCost;
-				gRes.filename = "sampleGraph.txt";
-				gRes.n = g.n;
-				gRes.q = g.q;
-
-				new AntAlgorithm(g).calcBestPath();
+				for(int i: checkedNumAnts)
+				{
+					Configuration.numberOfAnts = i;
+					for(double w1: checkedWeightAttr)
+					{
+						Configuration.weightAttractiveness = w1;
+						for(double w2: checkedPheromoneAttr)
+						{
+							Configuration.pheromoneAttractiveness = w2;
+							for(double r: checkedFadingRate)
+							{
+								Configuration.pheromoneFadingRate = r;
+								
+								System.out.format("%d/%d %d/%d %d/%d %d/%d\n",
+										checkedNumAnts.indexOf(i),
+										checkedNumAnts.size(),
+										checkedWeightAttr.indexOf(w1),
+										checkedWeightAttr.size(),
+										checkedPheromoneAttr.indexOf(w2),
+										checkedPheromoneAttr.size(),
+										checkedFadingRate.indexOf(r),
+										checkedFadingRate.size());
+								checkGraph(g,graphPath);
+							}
+						}
+					}
+				}
+				
 			}
 		} 
 		catch (Exception e)
@@ -96,6 +146,14 @@ public class Main
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private void checkGraph(Graph g,String graphPath)
+	{		
+		RunResults gRes = new AntAlgorithm(g).calcBestPath();
+		gRes.filename = graphPath;
+		
+		partialResults.add(gRes);
 	}
 
 	public void readConfig(String confPath)
@@ -256,7 +314,7 @@ public class Main
 	static public void main(String[] arg)
 	{
 		String config;
-		config = "test.txt";
+		config = "D:\\test.txt";
 		// config = arg[0];
 		
 		Main program = new Main();

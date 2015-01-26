@@ -1,6 +1,5 @@
 package wmh;
 
-import java.util.HashMap;
 import java.util.Vector;
 
 public class Vertex

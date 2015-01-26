@@ -1,7 +1,6 @@
 package wmh;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Vector;
 
 public class AntAlgorithm 
@@ -12,7 +11,9 @@ public class AntAlgorithm
 	int currentEpoch;
 	long duration;
 	Vector<Path> foundPaths;
+	Path bestPath;
 	Vector<Integer> pathsInEpoch;
+	boolean error = false;
 	
 	public AntAlgorithm(Graph graph)
 	{
@@ -29,36 +30,84 @@ public class AntAlgorithm
 		pathsInEpoch = new Vector<Integer>();
 	}
 	
-	public GraphResults calcBestPath()
+	public RunResults calcBestPath()
 	{
-		long start = System.nanoTime();
+		long start, stop;
 		
-		g.reset();
+		do
+		{
+			g.reset();
+			error = false;
+			start = System.nanoTime();
+			
+			launchLoop();
+			stop = System.nanoTime();
+		}
+		while(error);
 		
+		
+		duration = stop-start;
+		if(currentEpoch > Configuration.maxEpochs)
+			currentEpoch = Configuration.maxEpochs;
+		
+		findBestPath();
+		
+		if(Configuration.debug)
+			printSummary();
+		
+		RunResults results = new RunResults();
+		
+		results.bestPossibleCost = g.bestPathCost;
+		results.bestPossiblePath =(Vector) g.bestPath.clone();
+		results.executionTimeInNs = duration;
+		results.foodIdx = g.foodIdx;
+		results.nestIdx = g.nestIdx;
+		results.n = g.n;
+		results.q = g.q;
+		results.numberOfAnts = Configuration.numberOfAnts;
+		results.maxInitialPheromone = Configuration.maxInitialPheromone;
+		results.foundCost = bestPath.cost;
+		results.foundPath = bestPath.toString();
+		results.pathsInEpochs = (Vector) this.pathsInEpoch.clone();
+		results.pheromoneAttractiveness = Configuration.pheromoneAttractiveness;
+		results.pheromoneFadingRate = Configuration.pheromoneFadingRate;
+		results.pheromoneQConstant = Configuration.pheromoneQConstant;
+		results.weightAttractiveness = Configuration.weightAttractiveness;
+		
+		return results;
+	}
+
+	private boolean launchLoop()
+	{
 		boolean end = false;
-		
+		error = false;
 		while(!end)
 		{
 			resetAnts();
 			findPaths();
+			if(error)
+				break;
 			evaporatePheromone();
 			leavePheromone();
 			finalizeEpoch();
 			aggregatePaths();
 			end = checkEnd();
 		}
-		
-		long stop = System.nanoTime();
-		
-		duration = stop-start;
-		if(currentEpoch > Configuration.maxEpochs)
-			currentEpoch = Configuration.maxEpochs;
-		
-		printSummary();
-		
-		return null;
+		return error;
 	}
 	
+	private void findBestPath()
+	{
+		this.bestPath = new Path();
+		bestPath.cost = Double.MAX_VALUE;
+		
+		for(Path p:foundPaths)
+		{
+			if(p.cost < bestPath.cost)
+				bestPath = p;
+		}
+	}
+
 	private void printSummary()
 	{
 		System.out.println("####################################################");
@@ -187,9 +236,10 @@ public class AntAlgorithm
 			if(ant.currentVertex.idx != g.nestIdx)
 			{
 				ant.lost = true;
-				if(Configuration.debug)
+				//if(Configuration.debug)
 					System.out.format("X%dX ",ant.idx);
-				continue;
+				error = true;
+				break;
 			}
 			ant.removeLoops();
 			ant.path.refreshCost();
