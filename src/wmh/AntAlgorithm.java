@@ -9,6 +9,7 @@ public class AntAlgorithm
 	Ant[] ants;
 	private Vertex voidVertex;
 	int currentEpoch;
+	double meanEpoch;
 	long duration;
 	Vector<Path> foundPaths;
 	Path bestPath;
@@ -60,6 +61,7 @@ public class AntAlgorithm
 			while(error);
 
 			meanDuration += duration;
+			meanEpoch += currentEpoch;
 			processResults();
 			
 			System.out.format("%d ",i);
@@ -68,6 +70,7 @@ public class AntAlgorithm
 		
 		meanDuration/=Configuration.repetitions;
 		meanCost/=Configuration.repetitions;
+		meanEpoch /= Configuration.repetitions;
 		for(int i = 0; i < pathsInEpoch.size(); ++i)
 		{
 			pathsInEpoch.set(i, pathsInEpoch.elementAt(i)/Configuration.repetitions);
@@ -88,12 +91,14 @@ public class AntAlgorithm
 		results.maxInitialPheromone = Configuration.maxInitialPheromone;
 		results.bestFoundCost = bestPath.cost;
 		results.meanFoundCost = meanCost;
+		results.meanNumEpochs = meanEpoch;
 		results.bestFoundPath = bestPath.toString();
 		results.meanPathsInEpochs = (Vector) this.pathsInEpoch.clone();
 		results.pheromoneAttractiveness = Configuration.pheromoneAttractiveness;
 		results.pheromoneFadingRate = Configuration.pheromoneFadingRate;
 		results.pheromoneQConstant = Configuration.pheromoneQConstant;
 		results.weightAttractiveness = Configuration.weightAttractiveness;
+		
 		
 		return results;
 	}

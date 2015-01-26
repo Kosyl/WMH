@@ -30,7 +30,7 @@ public class RunResults
 	public double bestFoundCost;
 	public double meanFoundCost;
 	public long meanExecutionTimeInNs;
-	public int meanNumEpochs;
+	public double meanNumEpochs;
 
-	public Vector<Integer> meanPathsInEpochs = new Vector<Integer>();
+	public Vector<Double> meanPathsInEpochs = new Vector<Double>();
 }

@@ -36,21 +36,21 @@ public class Main
 
 	private void initTables()
 	{
-		double[] ww = {0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
-		//for(double w = 0.01; w < 10; w += 0.15)
+		//double[] ww = {0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
+		double[] ww = {0.5,1.0};
 		for(double w:ww)
 		{
 			checkedWeightAttr.add(w);
 			checkedPheromoneAttr.add(w);
 		}
-		double[] rr = {0.999,0.99,0.95,0.9,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.05,0.01,0.001};
-		//for(double r = 0.01; r < 1; r += 0.02)
+		//double[] rr = {0.999,0.99,0.95,0.9,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.05,0.01,0.001};
+		double[] rr = {0.5,0.2};
 		for(double r:rr)
 		{
 			checkedFadingRate.add(r);
 		}
-		int[] ii = {3,4,5,7,10,15,20,25,30,40,50,70,100};
-		//for(int i = 1; i < 500; i += 5)
+		//int[] ii = {3,4,5,7,10,15,20,25,30,40,50,70,100};
+		int[] ii = {3,15};
 		for(int i:ii)
 		{
 			checkedNumAnts.add(i);
@@ -83,7 +83,7 @@ public class Main
 			}
 		}
 
-		results.writeResults();
+		results.writeResults(this.partialResults);
 	}
 
 	public void sampleCheck()
@@ -125,13 +125,13 @@ public class Main
 								Configuration.pheromoneFadingRate = r;
 								
 								System.out.format("%d/%d %d/%d %d/%d %d/%d\n",
-										checkedNumAnts.indexOf(i),
+										checkedNumAnts.indexOf(i)+1,
 										checkedNumAnts.size(),
-										checkedWeightAttr.indexOf(w1),
+										checkedWeightAttr.indexOf(w1)+1,
 										checkedWeightAttr.size(),
-										checkedPheromoneAttr.indexOf(w2),
+										checkedPheromoneAttr.indexOf(w2)+1,
 										checkedPheromoneAttr.size(),
-										checkedFadingRate.indexOf(r),
+										checkedFadingRate.indexOf(r)+1,
 										checkedFadingRate.size());
 								checkGraph(g,graphPath);
 							}
@@ -139,6 +139,8 @@ public class Main
 					}
 				}
 				
+				ResultWriter writer = new ResultWriter();
+				writer.writeResults(partialResults);
 			}
 		} 
 		catch (Exception e)
@@ -316,6 +318,7 @@ public class Main
 	{
 		String config;
 		config = "D:\\test.txt";
+		Configuration.resultsPath = "D:\\wyniki.xls";
 		// config = arg[0];
 		
 		Main program = new Main();

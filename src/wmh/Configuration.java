@@ -25,5 +25,5 @@ public class Configuration
 	
 	public static boolean debug = true;
 	
-	public static int repetitions = 100;
+	public static int repetitions = 3;
 }
