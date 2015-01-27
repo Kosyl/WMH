@@ -37,20 +37,20 @@ public class Main
 	private void initTables()
 	{
 		//double[] ww = {0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
-		double[] ww = {0.5,1.0};
+		double[] ww = {0.5, 1.0, 2.0, 4.0};
 		for(double w:ww)
 		{
 			checkedWeightAttr.add(w);
 			checkedPheromoneAttr.add(w);
 		}
 		//double[] rr = {0.999,0.99,0.95,0.9,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.05,0.01,0.001};
-		double[] rr = {0.5,0.2};
+		double[] rr = {0.1, 0.3, 0.5, 0.9};
 		for(double r:rr)
 		{
 			checkedFadingRate.add(r);
 		}
 		//int[] ii = {3,4,5,7,10,15,20,25,30,40,50,70,100};
-		int[] ii = {3,15};
+		int[] ii = {5,10,20,30};
 		for(int i:ii)
 		{
 			checkedNumAnts.add(i);
@@ -317,8 +317,8 @@ public class Main
 	static public void main(String[] arg)
 	{
 		String config;
-		config = "D:\\test.txt";
-		Configuration.resultsPath = "D:\\wyniki.xls";
+		config = "D:\\n100.txt";
+		Configuration.resultsPath = "D:\\n100.xls";
 		// config = arg[0];
 		
 		Main program = new Main();
