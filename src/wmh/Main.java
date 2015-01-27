@@ -1,20 +1,9 @@
 package wmh;
-
-import java.awt.Dimension;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JFrame;
-
-import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.graph.UndirectedSparseGraph;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 //klasa glowna
 public class Main
@@ -316,36 +305,6 @@ public class Main
 
 		return g;
 	}
-
-	public void showGraph(Graph g) 
-	{
-		UndirectedSparseGraph<Integer, String> graph = new UndirectedSparseGraph<Integer, String>();
-		for(Vertex v : g.vertices)
-			graph.addVertex(v.idx);
-		
-		Integer id = 0;
-		for(Edge e : g.edges) {
-			graph.addEdge("["+id.toString() +"] "+ String.format("%.2f", e.weight), e.begin.idx, e.end.idx);
-			id++;
-		}
-		
-		Layout<Integer, String> layout = new CircleLayout<Integer, String>(graph);
-		layout.setSize(new Dimension(600, 600));
-		BasicVisualizationServer<Integer, String> vv = 
-				new BasicVisualizationServer<Integer, String>(layout);
-		vv.setPreferredSize(new Dimension(650, 650));
-		
-		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<Integer>());
-		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<String>());
-		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
-		
-        JFrame frame = new JFrame("Graph View");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(vv);
-		frame.pack();
-		frame.setVisible(true);
-	}
-	
 	
 	static public void main(String[] arg)
 	{
