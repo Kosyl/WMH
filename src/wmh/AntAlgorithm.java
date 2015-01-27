@@ -34,6 +34,7 @@ public class AntAlgorithm
 		pathsInEpoch = new Vector<Double>();
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public RunResults calcBestPath()
 	{
 		this.bestPath = new Path();
@@ -64,9 +65,9 @@ public class AntAlgorithm
 			meanEpoch += currentEpoch;
 			processResults();
 			
-			System.out.format("%d ",i);
+			//System.out.format("%d ",i);
 		}
-		System.out.println();
+		//System.out.println();
 		
 		meanDuration/=Configuration.repetitions;
 		meanCost/=Configuration.repetitions;
@@ -75,8 +76,8 @@ public class AntAlgorithm
 		{
 			pathsInEpoch.set(i, pathsInEpoch.elementAt(i)/Configuration.repetitions);
 		}
-		if(Configuration.debug)
-			printSummary();
+
+		printSummary();
 		
 		RunResults results = new RunResults();
 		
@@ -143,9 +144,9 @@ public class AntAlgorithm
 
 	private void printSummary()
 	{
-		System.out.println("####################################################");
+		System.out.println("\n####################################################");
 		System.out.println("koniec");
-		System.out.format("czas: %d\n",duration);
+		System.out.format("czas: %.2f ms\n",duration/1000000.0);
 		System.out.format("liczba iteracji: %d\\%d\n",currentEpoch,Configuration.maxEpochs);
 		System.out.println("znalezione sciezki:");
 		for(Path path: foundPaths)
@@ -219,8 +220,8 @@ public class AntAlgorithm
 	{
 		g.finalizeEpoch();
 		++currentEpoch;
-		if(Configuration.debug)
-			System.out.format("koniec epoki %d\n",currentEpoch);
+
+		System.out.format(". ",currentEpoch);
 	}
 
 	private void leavePheromone()
@@ -273,17 +274,11 @@ public class AntAlgorithm
 			if(ant.currentVertex.idx != g.nestIdx)
 			{
 				ant.lost = true;
-				//if(Configuration.debug)
-					System.out.format("X%dX ",ant.idx);
 				error = true;
 				break;
 			}
 			ant.removeLoops();
 			ant.path.refreshCost();
-			if(Configuration.debug)
-				System.out.format("%d ",ant.idx);
 		}
-		if(Configuration.debug)
-			System.out.println();
 	}
 }

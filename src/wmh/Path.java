@@ -42,6 +42,7 @@ public class Path
 		numAnts = 0;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Path clone()
 	{

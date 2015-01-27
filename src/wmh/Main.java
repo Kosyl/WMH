@@ -2,7 +2,6 @@ package wmh;
 
 import java.awt.Dimension;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -34,56 +33,91 @@ public class Main
 		initTables();
 	}
 
+	public boolean parseConfig(String confPath)
+	{
+		try
+		{
+			FileReader fi = new FileReader(confPath);
+			BufferedReader config = new BufferedReader(fi);
+			String s = config.readLine();
+			do
+			{
+				String data = (s.split("=")[0]).trim();
+				switch (data)
+				{
+				case "resultsPath":
+					Configuration.resultsPath = (s.replaceFirst(data + "=", "")).trim();
+					break;
+				case "pheromoneAttractiveness":
+					Configuration.pheromoneAttractiveness = Double.parseDouble((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "weightAttractiveness":
+					Configuration.weightAttractiveness = Double.parseDouble((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "pheromoneFadingRate":
+					Configuration.pheromoneFadingRate = Double.parseDouble((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "pheromoneQConstant":
+					Configuration.pheromoneQConstant = Double.parseDouble((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "maxInitialPheromone":
+					Configuration.maxInitialPheromone = Double.parseDouble((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "numberOfAnts":
+					Configuration.numberOfAnts = Integer.parseInt((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "antTimeoutInNs":
+					Configuration.antTimeout = Long.parseLong((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "maxCycles":
+					Configuration.maxEpochs = Integer.parseInt((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "debug":
+					Configuration.debug = Boolean.parseBoolean((s.replaceFirst(data + "=", "")).trim());
+					break;
+				case "repetitions":
+					Configuration.repetitions = Integer.parseInt((s.replaceFirst(data + "=", "")).trim());
+					break;
+				default:
+					break;
+				}
+				s = config.readLine();
+			} 
+			while (s != null);
+			config.close();
+			fi.close();
+		} 
+		catch (IOException e)
+		{
+			System.out.println("File input stream failure: " + e.getMessage());
+			return false;
+		}
+		
+		return true;
+	}
+	
 	private void initTables()
 	{
-		//double[] ww = {0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9,1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
-		double[] ww = {0.5, 1.0, 2.0, 4.0};
-		for(double w:ww)
+		double[] wwp = {0.5};//beta
+		for(double w:wwp)
 		{
 			checkedWeightAttr.add(w);
+		}
+		double[] wwe =  {1};//alpha
+		for(double w:wwe)
+		{
 			checkedPheromoneAttr.add(w);
 		}
-		//double[] rr = {0.999,0.99,0.95,0.9,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.05,0.01,0.001};
-		double[] rr = {0.1, 0.3, 0.5, 0.9};
+		double[] rr = {0.5};
 		for(double r:rr)
 		{
 			checkedFadingRate.add(r);
 		}
-		//int[] ii = {3,4,5,7,10,15,20,25,30,40,50,70,100};
-		int[] ii = {5,10,20,30};
+		int[] ii = {20};
 		for(int i:ii)
 		{
 			checkedNumAnts.add(i);
 		}
-	}
-
-	public void startForConfigFile(String plik)
-	{
-		try
-		{
-			if(plik.isEmpty())
-				return;
-			readConfig(plik);
-		} 
-		catch (Exception e)
-		{
-			System.out.println("Wyjatek: " + e.getMessage());
-			e.printStackTrace();
-			System.exit(1);
-		}
-		int counter = 0;
-		for (String filename : Configuration.files)
-		{
-			System.out.println(counter);
-			++counter;
-			Graph g = readGraph(filename);
-			if (g != null)
-			{
-				//policzyc
-			}
-		}
-
-		results.writeResults(this.partialResults);
 	}
 
 	public void sampleCheck()
@@ -138,9 +172,11 @@ public class Main
 						}
 					}
 				}
-				
+
 				ResultWriter writer = new ResultWriter();
-				writer.writeResults(partialResults);
+				//writer.writeResults(partialResults);
+				//writer.writePathsInEpochs(partialResults);
+				writer.writeAlfaBeta2D(partialResults, checkedWeightAttr,checkedPheromoneAttr);
 			}
 		} 
 		catch (Exception e)
@@ -151,6 +187,31 @@ public class Main
 		}
 	}
 
+	public void singleGraphFromConfig(String graphPath)
+	{
+		try
+		{
+			Graph g = readGraph(graphPath);
+			
+			//showGraph(g);
+			if (g != null)
+			{
+				checkGraph(g,graphPath);
+				
+				ResultWriter writer = new ResultWriter();
+				writer.writeResults(partialResults);
+				//writer.writePathsInEpochs(partialResults);
+				//writer.writeAlfaBeta2D(partialResults, checkedWeightAttr,checkedPheromoneAttr);
+			}
+		} 
+		catch (Exception e)
+		{
+			System.out.println("Wyjatek: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
 	private void checkGraph(Graph g,String graphPath)
 	{		
 		RunResults gRes = new AntAlgorithm(g).calcBestPath();
@@ -159,49 +220,21 @@ public class Main
 		partialResults.add(gRes);
 	}
 
-	public void readConfig(String confPath)
+	public void singleFolder(String confPath)
 	{
-		try
-		{
-			FileReader fi = new FileReader(confPath);
-			BufferedReader config = new BufferedReader(fi);
-			String s = config.readLine();
-			do
-			{
-				String data = s.split("=")[0];
-				switch (data)
-				{
-				case "inputFolder":
-					Configuration.folderPath = s.replaceFirst(data + "=", "");
-					break;
-				case "outputFile":
-					Configuration.resultsPath = s.replaceFirst(data + "=", "");
-					break;
-				default:
-					break;
-				}
-				s = config.readLine();
-			} 
-			while (s != null && !s.isEmpty());
-			config.close();
-			fi.close();
-		} 
-		catch (IOException e)
-		{
-			System.out.println("File input stream failure: " + e.getMessage());
-		}
-
-		// zapisujemy na liscie w Configuration wszystkie pliki z folderu z
-		// grafami
-		File folder = new File(Configuration.folderPath);
+		File folder = new File(confPath);
 		File[] files = folder.listFiles();
 		if (files != null)
 		{
 			for (final File fileEntry : files)
 			{
 				String path = fileEntry.getAbsolutePath();
-				Configuration.files.add(path);
+				singleGraph(path);
 			}
+
+			ResultWriter writer = new ResultWriter();
+			writer.writeResults(partialResults);
+			writer.writePathsInEpochs(partialResults);
 		}
 	}
 
@@ -316,12 +349,22 @@ public class Main
 	
 	static public void main(String[] arg)
 	{
-		String config;
-		config = "D:\\n100.txt";
-		Configuration.resultsPath = "D:\\n100.xls";
-		// config = arg[0];
-		
+		if(arg.length != 2)
+		{
+			System.out.format("uzycie:\njava -jar nazwa_programu.jar sciezka_konfiguracji sciezka_grafu\n","");
+			return;
+		}
 		Main program = new Main();
-		program.singleGraph(config);
+		
+		String config = arg[0];
+		
+		if(!program.parseConfig(config))
+		{
+			System.out.format("Nieprawid³owy plik konfiguracji.\n");
+			return;
+		}
+		
+		program.singleGraphFromConfig(arg[1]);
+		//program.singleFolder(config);
 	}
 }

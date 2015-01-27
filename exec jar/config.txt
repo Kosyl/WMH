@@ -1,0 +1,15 @@
+resultsPath=D:/results.xls
+pheromoneAttractiveness=1.0
+weightAttractiveness=0.5
+pheromoneFadingRate=0.5
+pheromoneQConstant=1
+maxInitialPheromone=0.02
+	
+numberOfAnts=30
+antTimeoutInNs=500000000
+	
+maxCycles=2500
+	
+debug=false
+	
+repetitions=1
