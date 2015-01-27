@@ -19,7 +19,7 @@ public class ResultWriter
 	{
 		try
 		{
-			WritableWorkbook skoroszyt = Workbook.createWorkbook(new File(Configuration.resultsPath+".xls"));
+			WritableWorkbook skoroszyt = Workbook.createWorkbook(new File(Configuration.resultsPath));
 			
 			WritableSheet arkusz = skoroszyt.createSheet("Arkusz", 0);
 			
@@ -46,8 +46,7 @@ public class ResultWriter
 					col_bestCost = 11,
 					col_meanCost = 12,
 					col_meanTime = 13,
-					col_meanEpochs = 14,
-					col_meanPathsPerEpoch = 15;
+					col_meanEpochs = 14;
 			
 			Label tekst1 = new Label(col_idx, 0, "Numer przebiegu", titleCell);
 			arkusz.addCell(tekst1);
@@ -79,8 +78,6 @@ public class ResultWriter
 			arkusz.addCell(tekst14);
 			Label tekst15 = new Label(col_meanEpochs, 0, "œrednia iloœæ cykli", titleCell);
 			arkusz.addCell(tekst15);
-			Label tekst16 = new Label(col_meanPathsPerEpoch, 0, "zbie¿noœæ w cyklach", titleCell);
-			arkusz.addCell(tekst16);
 			
 			WritableCellFormat floatFormat = new WritableCellFormat(NumberFormats.FLOAT);
 			WritableCellFormat intFormat = new WritableCellFormat(NumberFormats.INTEGER);
@@ -119,14 +116,6 @@ public class ResultWriter
 				arkusz.addCell(meanTime);
 				Number meanEpochs = new Number(col_meanEpochs, row, res.meanNumEpochs, floatFormat);
 				arkusz.addCell(meanEpochs);
-
-				//int startingIdx = col_meanPathsPerEpoch+1;
-				//for(double d: res.meanPathsInEpochs)
-				//{
-				//	Number paths = new Number(startingIdx, row, d, floatFormat);
-				//	arkusz.addCell(paths);
-				//	++startingIdx;
-				//}
 
 				++row;
 			}
